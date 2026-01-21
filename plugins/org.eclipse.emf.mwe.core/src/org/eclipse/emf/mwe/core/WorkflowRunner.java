@@ -143,7 +143,7 @@ public class WorkflowRunner {
 			method.invoke(cmdLineProcessor.getDeclaredConstructor().newInstance(), unprocessedArgs.toArray(new String[0]), params,
 					runner.getContext());
 		} else {
-			params = resolveParams(line.getOptionValues(PARAM));
+			params = (Map)line.getOptionProperties(PARAM);
 			wfFile = line.getArgs()[0];
 		}
 
@@ -207,7 +207,7 @@ public class WorkflowRunner {
 				.build());
 
 		final Option paramOption = Option.builder(PARAM).argName("key=value")
-				.desc("external property that is handled as workflow property").hasArg().build();
+				.desc("external property that is handled as workflow property").hasArgs().build();
 		paramOption.setLongOpt("param");
 		options.addOption(paramOption);
 
@@ -227,28 +227,6 @@ public class WorkflowRunner {
 		final CommandLineParser parser = new DefaultParser();
 		CommandLine line = parser.parse(options, args);
 		return line;
-	}
-
-	/**
-	 * Convert type line arguments into a hashmap. Each parameter is expected in format -pkey=value
-	 * 
-	 * @param args
-	 *            Program arguments
-	 * @return A map containing all identified parameters
-	 */
-	protected Map<String, String> resolveParams(final String[] args) {
-		final Map<String, String> params = new HashMap<String, String>();
-		if (args == null) {
-			return params;
-		}
-		for (final String element : args) {
-			final String[] string = element.split("=", 2);
-			if (string.length != 2) {
-				throw new IllegalArgumentException("wrong param syntax (-pkey=value). was : " + element);
-			}
-			params.put(string[0], string[1]);
-		}
-		return params;
 	}
 
 	/**
